@@ -1,7 +1,8 @@
 module Tabulous
   class Tabset
 
-    def initialize
+    def initialize config = {}
+      @config = config
       @tabs = []
     end
 
@@ -33,6 +34,10 @@ module Tabulous
       else
         active_primary_tab(view).subtabs.select{|subtab| subtab.visible?(view)}
       end
+    end
+
+    def config
+      @config
     end
 
   end

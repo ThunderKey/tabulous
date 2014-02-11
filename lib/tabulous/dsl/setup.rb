@@ -16,8 +16,8 @@ module Tabulous
           Dsl::Config.process(&block) if block_given?
         end
 
-        def tabs(tabset_name = :default, &block)
-          tabset = Dsl::Tabs.process(&block)
+        def tabs(tabset_name = :default, config = {}, &block)
+          tabset = Dsl::Tabs.process(config, &block)
           Tabsets.add(tabset_name, tabset)
         end
 

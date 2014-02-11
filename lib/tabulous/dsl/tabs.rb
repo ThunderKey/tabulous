@@ -3,8 +3,8 @@ module Tabulous
     class Tabs
       class << self
 
-        def process(&block)
-          @tabset = Tabset.new
+        def process(config = {}, &block)
+          @tabset = Tabset.new(config)
           @parent_tab = nil
           instance_exec(&block)
           check_for_errors!

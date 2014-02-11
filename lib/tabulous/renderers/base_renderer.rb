@@ -16,6 +16,10 @@ module Tabulous
 
   protected
 
+    def config
+      @tabset.config
+    end
+
     def tab_html(tab)
       raise "override me"
     end
