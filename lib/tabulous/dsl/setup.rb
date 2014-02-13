@@ -7,6 +7,14 @@ module Tabulous
           instance_exec(OldVersionChecker.new, &block)
         end
 
+        def create(config)
+          default_config = config.delete(:default_config) || {}
+          config.each do |tabset_name, tabset_data|
+            raise ':tabs is needed to create a new setup' unless tabset_data[:tabs]
+            Tabsets.add(tabset_name, Dsl::Tabs.new(tabset_data[:config], default_config).create(tabset_data[:tabs]))
+          end
+        end
+
         def customize(&block)
           Dsl::Config.process(&block)
         end
@@ -17,7 +25,7 @@ module Tabulous
         end
 
         def tabs(tabset_name = :default, config = {}, &block)
-          tabset = Dsl::Tabs.process(config, &block)
+          tabset = Dsl::Tabs.new(config).process(&block)
           Tabsets.add(tabset_name, tabset)
         end
 

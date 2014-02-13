@@ -2,12 +2,13 @@ module Tabulous
   class Tab
 
     attr_reader :parent
-    attr_accessor :subtabs, :kind, :name, :declared_to_have_subtabs
+    attr_accessor :subtabs, :kind, :name, :declared_to_have_subtabs, :tabs
     attr_writer :text, :link_path, :visible_when, :enabled_when, :http_verb
 
     def initialize
       @subtabs = []
-      @active_actions = {}
+      @tabs = Tabset.new
+      @active_actions =  {}
       @kind = :primary_tab
       @declared_to_have_subtabs = false
       @http_verb = :get

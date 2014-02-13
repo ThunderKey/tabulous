@@ -40,5 +40,9 @@ module Tabulous
       @config
     end
 
+    def empty?
+      @tabs.empty?
+    end
+
   end
 end

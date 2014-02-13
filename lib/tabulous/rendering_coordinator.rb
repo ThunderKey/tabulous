@@ -20,46 +20,49 @@ module Tabulous
     def initialize(tabset, view)
       @view = view
       @tabset = tabset
-      renderer_name = if tabset.config && tabset.config.has_key?(:renderer)
-        tabset.config[:renderer].to_s.camelize
-      else
-        Config.renderer.to_s.camelize
-      end
-      begin
-        @renderer = "Tabulous::#{renderer_name}Renderer".constantize.new(tabset, view)
-      rescue NameError
-        @renderer = "#{renderer_name}Renderer".constantize.new(tabset, view)
-      end
     end
 
     def render_tabs
       return if check_for_active_tab == :do_not_render
       html = ''
-      html << CssScaffolding.embeddable_styles if Config.use_css_scaffolding
-      html << @renderer.tabs_html
+      html << CssScaffolding.embeddable_styles if config(:use_css_scaffolding)
+      html << renderer.tabs_html
       @view.raw(html)
     end
 
     def render_subtabs
       return if check_for_active_tab == :do_not_render
-      return '' if @tabset.visible_subtabs(@view).empty? && !Config.render_subtabs_when_empty
+      return '' if @tabset.visible_subtabs(@view).empty? && !config(:render_subtabs_when_empty)
       html = ''
-      html << @renderer.subtabs_html
+      html << renderer.subtabs_html
       @view.raw(html)
     end
 
   private
 
+    def renderer
+      @renderer ||= begin
+        renderer_name = config(:renderer).to_s.camelize
+        "Tabulous::#{renderer_name}Renderer".constantize.new(@tabset, @view)
+      rescue NameError
+        "#{renderer_name}Renderer".constantize.new(@tabset, @view)
+      end
+    end
+
     def check_for_active_tab
       if !@tabset.active_primary_tab(@view)
-        if Config.when_action_has_no_tab == :raise_error
+        if config(:when_action_has_no_tab) == :raise_error
           msg = "No tab is defined for the action '#{@view.action_name}' in the controller '#{@view.controller_path}'."
           msg << " One of your tabs should have a valid active_when declaration that hooks it up to this controller action."
           raise NoTabFoundError, msg
         else
-          return Config.when_action_has_no_tab
+          return config(:when_action_has_no_tab)
         end
       end
+    end
+
+    def config(key)
+      @tabset.config.has_key?(key) ? @tabset.config[key] : Config.send(key)
     end
 
   end
